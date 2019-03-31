@@ -8,7 +8,7 @@ First you need to clone this directory and run commands listed below:
 
 ### `npm install`
 
-Before starting the application you need to install all the dependencies in your project
+Before starting the application you need to install all the dependencies in your project.
 
 ### `npm start`
 
