@@ -1,24 +1,30 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import SimpleReactValidator from 'simple-react-validator';
+import { toast } from 'react-toastify';
+import cookie from 'react-cookies'
+import { loginUser } from '../utils'
 import './../css/App.css';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {callApi} from './../actions/index.js';
 
 class Login extends Component {
 
 	constructor(props){
 		super(props)
 			this.state = {
-				email : '',
+				username : '',
 				password : '',
+				loading : ''
 			}
 
 		this.validator = new SimpleReactValidator();
 
 	}
 
+	componentDidMount(){
+		const isloggedIn = cookie.load('LoggedIn')
+		if(isloggedIn == 'true'){
+			this.props.history.push('/home')
+		}
+	}
 
 	setVal = (event) => {
 		var obj = {};
@@ -26,10 +32,20 @@ class Login extends Component {
 		this.setState(obj);
 	}
 
-	handelLogin = () => {
-
+	handelLogin = async () => {
+		const { username, password } = this.state
+		const { history } = this.props
 		if( this.validator.allValid() ){
-	      this.props.callApi(this.state.email, this.state.password, this.props.history);
+			this.setState({loading: true})
+		  const res = await loginUser({username, password});
+		  if(res.status){
+				toast.success(res.msg)
+				history.push('/home')
+				this.setState({loading: ''})
+		  }else{
+			toast.error(res.msg)
+			this.setState({loading: ''})
+		  }
 	    } else {
 	      this.validator.showMessages();
 	      this.forceUpdate();
@@ -38,6 +54,7 @@ class Login extends Component {
 	}
 
   render() {
+	  const { username, password, loading } = this.state
     return (
       <div className="container">
     	<div className="row justify-content-center">
@@ -46,11 +63,11 @@ class Login extends Component {
                 	<div className="card-header">Login</div>
 						<div className="card-body">
                 			<div className="form-group row">
-                            	<label htmlFor="email" className="col-md-4 col-form-label text-md-right">E-Mail Address
+                            	<label htmlFor="email" className="col-md-4 col-form-label text-md-right">User Name
                             	</label>
                             	<div className="col-md-6">
-                                <input ref='email' type="email" name="email" onChange={this.setVal}/>
-                                <p className='text-danger'>{this.validator.message('email', this.state.email, 'required|email')}</p>
+                                <input ref='email' type="email" name="username" onChange={this.setVal} autoComplete='off'/>
+                                <p className='text-danger'>{this.validator.message('User Name', username, 'required')}</p>
                             	</div>
                         	</div>
 
@@ -59,13 +76,13 @@ class Login extends Component {
                             	</label>
 								<div className="col-md-6">
                                 	<input ref="password" type="password" name='password' onChange={this.setVal}/>
-                                	<p className='text-danger'>{this.validator.message('password', this.state.password, 'required|between:6,10')}</p>
+                                	<p className='text-danger'>{this.validator.message('Password', password, 'required')}</p>
                             	</div>
                         	</div>
 
                         	<div className="form-group row mb-0">
                             	<div className="col-md-8 offset-md-4">
-                                	<button type="submit" className="btn btn-primary" onClick={this.handelLogin}>Login</button>
+									<button type="submit" className="btn btn-primary" disabled={loading} onClick={this.handelLogin}>{ loading ? 'Processing...' : 'Login'}</button>
                                 </div>
                         	</div>
                         </div>
@@ -77,14 +94,4 @@ class Login extends Component {
   }
 }
 
-function mapStateToProps(state){
-	return{	
-		appData : state.appData
-	}
-}
-
-function matchDispatchToProps(dispatch){
-    return bindActionCreators({callApi: callApi}, dispatch);
-}
-
-export default connect(mapStateToProps,matchDispatchToProps)(Login);
+export default Login;

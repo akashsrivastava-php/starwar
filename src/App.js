@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import logo from './logo.svg';
-import './App.css';
-
+import { toast } from 'react-toastify';
 import { Routing } from './route/Route.js';
+import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 
+toast.configure()
 class App extends Component {
   render() {
     return (
