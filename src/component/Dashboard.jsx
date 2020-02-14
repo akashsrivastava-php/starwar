@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import cookie from 'react-cookies'
 import { toast } from 'react-toastify';
 import { logoutUser, searchPlanet } from '../utils'
+import loader from '../loader.gif'
 
 class Dashboard extends Component {
 	constructor(props){
@@ -81,7 +82,7 @@ class Dashboard extends Component {
 								{
 									isLoading &&
 									<div className="col-md-12 text-center">
-										<img src="/loader.gif" width="120"/>
+										<img src={loader} width="120"/>
 									</div>
 								}
                         	</div>
